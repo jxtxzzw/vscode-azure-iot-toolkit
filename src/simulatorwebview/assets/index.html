@@ -23,7 +23,9 @@
 </head>
 
 <body>
+    
     <div id="app" data-endpoint="{{endpoint}}" v-cloak>
+            <i-button type="primary" @click="open(false)">Open notice</i-button>
         <Row>
             <i-col span="15">
                 <Card :dis-hover="true" :bordered="false">
@@ -70,7 +72,7 @@
                                     <i-input v-model="formItem.numbers" placeholder="Number of messages for per device"></i-input>
                                 </form-item>
                             </i-col>
-                            <i-col span="10" offset="4">
+                            <i-col span="10" offset="1">
                                 <form-item prop="interval" label="Interval">
                                     <i-input v-model="formItem.interval" placeholder="Interval between two messages">
                                         <i-select v-model="intervalUnit" slot="append" style="width: 150px">

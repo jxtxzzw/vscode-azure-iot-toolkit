@@ -229,8 +229,39 @@ const app = new Vue({
             return false;
           })
           return validated;
-        }
-        
+        },
+        async f () {
+          await Promise.reject('aaa');
+        },
+        open (nodesc) {
+          this.$Message.loading({
+              duration: 0,
+              closable: false,
+              render: h => {
+                return h('span', [
+                    'This is created by ',
+                    h('a', 'render'),
+                    ' function',
+                    h('Button', {
+                      props: {
+                        type: 'primary'
+                      }
+                    }, 'aaa'),
+                    h('Button', {
+                      props: {
+                        type: 'primary'
+                      }
+                    }, 'aaa'),
+                    h('Progress', {
+                      props: {
+                        percent: '40',
+                        'success-percent': '30'
+                      }
+                    })
+                ])
+            }
+          });
+      }
     }
 });
   

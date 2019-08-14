@@ -56,6 +56,7 @@ export class LocalServer {
         this.router.post("/api/send", async(req, res, next) => await this.send(req, res, next));
         this.router.post("/api/generaterandomjson", async(req, res, next) => await this.generateRandomJson(req, res, next));
         this.router.post("/api/setprocessing", async(req, res, next) => await this.setProcessing(req, res, next));
+        this.router.post("/api/presistinputs", async(req, res, next) => await this.persistInputs(req, res, next));
     }
 
     private initApp() {
@@ -110,6 +111,14 @@ export class LocalServer {
             const processing = data.processing;
             Simulator.setProcessing(processing);
             return res.status(200).json(processing);
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    private async persistInputs(req: express.Request, res: express.Response, next: express.NextFunction) {
+        try {
+            // TODO
         } catch (err) {
             next(err);
         }
