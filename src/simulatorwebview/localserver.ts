@@ -112,7 +112,9 @@ export class LocalServer {
 
     private async persistInputs(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
-            // TODO
+            const inputs = req.body;
+            this._simulator.persistInputs(inputs);
+            res.sendStatus(200);
         } catch (err) {
             next(err);
         }

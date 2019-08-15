@@ -23,6 +23,14 @@ export class Simulator {
     private processing: boolean;
     private cancelToken: boolean;
     private totalStatus: SendStatus;
+    private persistedInputs: {
+        numbers: '',
+        interval: '',
+        intervalUnit: '',
+        messageBody: '',
+        plainTextArea: '',
+        dummyJsonArea: ''
+    }
 
     private constructor(context: vscode.ExtensionContext) {
         this.context = context;
@@ -173,6 +181,15 @@ export class Simulator {
 
     public getStatus () : SendStatus {
         return this.totalStatus;
+    }
+
+    public persistInputs (persistedInputs) {
+        this.persistedInputs = persistedInputs;
+        console.log(this.persistedInputs);
+    }
+
+    public getPersistedInputs() {
+        return this.persistedInputs;
     }
 
 }

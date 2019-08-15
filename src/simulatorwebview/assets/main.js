@@ -190,13 +190,17 @@ const app = new Vue({
                 }
               });
         },
-        messageBodyChange (name) {
+        async messageBodyChange (name) {
           this.messageBody = name;
           // If user clicks on 'Plain Text', the 'Preview' panel bacomes meaningless.
           // So we hide it, and (if user was on 'Preview', we) make the panel focus on 'Write' again.
           if (name === 'Plain Text') {
             this.messageInputAreaTab = 'Write';
           }
+          await this.persistInputs();
+        },
+        async intervalUnitChange (name) {
+          await this.persistInputs();
         },
         async generateDummyJson () {
           const template = {
@@ -220,11 +224,23 @@ const app = new Vue({
           } else if (this.messageBody === 'Plain Text') {
             this.formItem.message = this.textArea.plainTextArea;
           }
+          await this.persistInputs();
         },
       async progressCancel() {
         await axios.post(`${this.endpoint}/api/cancel`, {
           cancel: true
         });
+      },
+      async persistInputs() {
+        const inputs = {
+          numbers: this.formItem.numbers,
+          interval: this.formItem.interval,
+          intervalUnit: this.intervalUnit,
+          messageBody: this.messageBody,
+          plainTextArea: this.textArea.plainTextArea,
+          dummyJsonArea: this.textArea.dummyJsonArea
+        }
+        await axios.post(`${this.endpoint}/api/presistinputs`, inputs);
       }
     }
 });
