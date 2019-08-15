@@ -127,6 +127,7 @@ const app = new Vue({
             status: {
               numberOfSentMessage: 0,
               numberOfSuccessfulMessage: 0,
+              numberOfTotalMessage: 0,
               isProcessing: false
             }
         }
@@ -141,6 +142,17 @@ const app = new Vue({
         }
     },
     methods: {
+      async polling() {
+        await axios.get(`${this.endpoint}/api/polling`)
+        .then((res) => {
+          this.status.numberOfSentMessage = res.data.numberOfSentMessage;
+          this.status.numberOfSuccessfulMessage = res.data.numberOfSuccessfulMessage;
+          this.status.numberOfTotalMessage = res.data.numberOfTotalMessage;
+        })
+        .catch((err) => {
+
+        });
+      },
         async getProcessingStatus() {
           this.isProcessing = (await axios.get(`${this.endpoint}/api/isprocessing`)).data;
         },
@@ -149,9 +161,10 @@ const app = new Vue({
         // this function aims at trying to get status every second, if isProcessing=true when the page is loaded
         async tryLatestProcessingStatus() {
           await this.getProcessingStatus();
-          if (this.isProcessing) {
+          await this.polling();
+          // if (this.isProcessing) {
             setTimeout(this.tryLatestProcessingStatus, 1000);
-          }
+          // }
         },
         async getIoTHubHostName () {
           this.hostName = (await axios.get(`${this.endpoint}/api/getiothubhostname`)).data;
@@ -197,6 +210,7 @@ const app = new Vue({
                     const doneProcess = {
                       processing: false
                     }
+                    this.open();
                     await axios.post(`${this.endpoint}/api/setprocessing`, toProcess)
                       .then((res) => {
                         this.isProcessing = res.data;
@@ -249,21 +263,27 @@ const app = new Vue({
               closable: false,
               render: h => {
                 return h('div', [
+                    h('p',
+                    `The simulator has already sent ${this.status.numberOfSentMessage} of the ${this.status.numberOfTotalMessage} message(s).
+                    ${this.status.numberOfSuccessfulMessage} of them are successfully sent.`,
+                    ),
                     h('Progress', {
                       props: {
-                        percent: this.status.numberOfSentMessage,
-                        'success-percent': this.status.numberOfSuccessfulMessage
+                        percent: Math.round(this.status.numberOfSentMessage / this.status.numberOfTotalMessage * 100),
+                        'success-percent': Math.round(this.status.numberOfSuccessfulMessage / this.status.numberOfTotalMessage * 100)
                       }
                     }),
-                    'The simulator has already sent ' + this.status.numberOfSentMessage + ' message(s)' +
-                      this.status.numberOfSuccessfulMessage + ' of them are successfully sent.'
-                ])
+                    h('Button', {
+                      on: {
+                        click: this.close
+                      }
+                    }, 'Cancel'),
+                  ])
             }
           });
-          setTimeout(this.f, 1000);
       },
-      async polling () {
-
+      close() {
+        this.$Message.destroy();
       }
     }
 });

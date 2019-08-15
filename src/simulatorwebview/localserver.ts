@@ -9,6 +9,7 @@ import { Constants } from "../constants";
 import { DeviceItem } from "../Model/DeviceItem";
 import { Simulator } from "../simulator";
 import { Utility } from "../utility";
+import { SendStatus } from "../sendStatus";
 
 export class LocalServer {
     private app: express.Express;
@@ -127,7 +128,13 @@ export class LocalServer {
 
     private async polling(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
-            // TODO
+            const status: SendStatus = this._simulator.getStatus();
+            const result = {
+                numberOfSentMessage: status.sum(),
+                numberOfSuccessfulMessage: status.getSucceed(),
+                numberOfTotalMessage: status.getTotal()
+            }
+            return res.status(200).json(result);
         } catch (err) {
             next(err);
         }

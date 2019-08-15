@@ -22,6 +22,7 @@ export class Simulator {
     private outputChannel: vscode.OutputChannel;
     private processing: boolean;
     private cancelToken: boolean;
+    private totalStatus: SendStatus;
 
     private constructor(context: vscode.ExtensionContext) {
         this.context = context;
@@ -114,7 +115,6 @@ export class Simulator {
         while (milliSecond > 1000) {
             await this.delay(1000);
             if (this.cancelToken) {
-                this.cancelToken = false;
                 return;
             } else {
                 milliSecond -= 1000;
@@ -132,16 +132,12 @@ export class Simulator {
             this.output(`Invalid Operation.`);
             return Promise.reject();
         }
-        const token = {
-            isCancellationRequested:false
-        }
-        const step = 100 / total;
         const startTime = new Date();
         this.output(`Start sending messages from ${deviceCount} device(s) to IoT Hub.`);
         let clients = [];
         let statuses = [];
         let ids = [];
-        let totalStatus = new SendStatus("Total", total);
+        this.totalStatus = new SendStatus("Total", total);
         for (let i = 0; i < deviceCount; i++) {
             clients.push(await clientFromConnectionString(deviceConnectionStrings[i]));
             statuses.push(new SendStatus(ConnectionString.parse(deviceConnectionStrings[i]).DeviceId, numbers));
@@ -153,9 +149,9 @@ export class Simulator {
                 // We use a template so that each time the message can be randomly generated.
                 const generatedMessage = isTemplate ? dummyjson.parse(template) : template;
                 console.log(generatedMessage)
-                this.sendD2CMessageCore(clients[j], generatedMessage, statuses[j], totalStatus);
+                this.sendD2CMessageCore(clients[j], generatedMessage, statuses[j], this.totalStatus);
             }); 
-            if (token.isCancellationRequested) {
+            if (this.cancelToken) {
                 break;
             }
             if (i < numbers - 1) {
@@ -164,15 +160,17 @@ export class Simulator {
             }
         }
         const endTime = new Date();
-            this.output(`${token.isCancellationRequested ? "User aborted" : "All device(s) finished."}`,
+            this.output(`${this.cancelToken ? "User aborted" : "All device(s) finished."}`,
             );
-            while ((!token.isCancellationRequested) && (totalStatus.sum() !== totalStatus.getTotal())) {
+            while ((!this.cancelToken) && (this.totalStatus.sum() !== this.totalStatus.getTotal())) {
                 await this.delay(500);
             }
-            this.output(`Duration: ${(endTime.getTime() - startTime.getTime()) / 1000} second(s), with ${totalStatus.getSucceed()} succeed, and ${totalStatus.getFailed()} failed.`,
+            this.output(`Duration: ${(endTime.getTime() - startTime.getTime()) / 1000} second(s), with ${this.totalStatus.getSucceed()} succeed, and ${this.totalStatus.getFailed()} failed.`,
             );
     }
 
+    public getStatus () : SendStatus {
+        return this.totalStatus;
+    }
 
-    
 }
