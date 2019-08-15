@@ -52,12 +52,11 @@ export class LocalServer {
         this.router = express.Router();
         this.router.get("/api/getinputdevicelist", async(req, res, next) => await this.getInputDeviceList(req, res, next));
         this.router.get("/api/getiothubhostname", async(req, res, next) => await this.getIoTHubHostName(req, res, next));
-        this.router.get("/api/isprocessing", async(req, res, next) => await this.isProcessing(req, res, next));
         this.router.get("/api/getpreselected", async(req, res, next) => await this.getPreSelected(req, res, next));
         this.router.get("/api/polling", async(req, res, next) => await this.polling(req, res, next));
         this.router.post("/api/send", async(req, res, next) => await this.send(req, res, next));
         this.router.post("/api/generaterandomjson", async(req, res, next) => await this.generateRandomJson(req, res, next));
-        this.router.post("/api/setprocessing", async(req, res, next) => await this.setProcessing(req, res, next));
+        this.router.post("/api/cancel", async(req, res, next) => await this.cancel(req, res, next));
         this.router.post("/api/presistinputs", async(req, res, next) => await this.persistInputs(req, res, next));
     }
 
@@ -98,21 +97,14 @@ export class LocalServer {
         }
     }
 
-    private async isProcessing(req: express.Request, res: express.Response, next: express.NextFunction) {
-        try {
-            const processing = await this._simulator.isProcessing();
-            return res.status(200).json(processing);
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    private async setProcessing(req: express.Request, res: express.Response, next: express.NextFunction) {
+    private async cancel(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
             const data = req.body;
-            const processing = data.processing;
-            this._simulator.setProcessing(processing);
-            return res.status(200).json(processing);
+            const cancel = data.cancel;
+            if (cancel) {
+                this._simulator.cancel();
+            }
+            return res.sendStatus(200);
         } catch (err) {
             next(err);
         }
@@ -130,9 +122,10 @@ export class LocalServer {
         try {
             const status: SendStatus = this._simulator.getStatus();
             const result = {
-                numberOfSentMessage: status.sum(),
-                numberOfSuccessfulMessage: status.getSucceed(),
-                numberOfTotalMessage: status.getTotal()
+                numberOfSentMessage: status ? status.sum() : 0,
+                numberOfSuccessfulMessage: status ? status.getSucceed() : 0,
+                numberOfTotalMessage: status ? status.getTotal() : 0,
+                isProcessing: this._simulator.isProcessing()
             }
             return res.status(200).json(result);
         } catch (err) {

@@ -56,10 +56,6 @@ export class Simulator {
         return this.processing;
     }
 
-    public setProcessing(processing: boolean) {
-        this.processing = processing;
-    }
-
     public cancel() {
         this.cancelToken = true;
     }
@@ -71,9 +67,15 @@ export class Simulator {
     }
 
     public async sendD2CMessage(deviceConnectionStrings: string[], template: string, isTemplate: boolean, numbers: number, interval: number) {
-        this.setProcessing(true);
-        await this.sendD2CMessageFromMultipleDevicesRepeatedly(deviceConnectionStrings, template, isTemplate, numbers, interval);
-        this.setProcessing(false);
+        if (!this.processing) {
+            this.processing = true;
+            await this.sendD2CMessageFromMultipleDevicesRepeatedly(deviceConnectionStrings, template, isTemplate, numbers, interval);
+            this.processing = false;
+            // The cancel token can only be re-initialized out of any send() or delay() functions.
+            this.cancelToken = false;
+        } else {
+            vscode.window.showErrorMessage('A previous simulation is in progress...');
+        }
     }
 
     private output (message: string) {

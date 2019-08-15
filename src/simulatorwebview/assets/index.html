@@ -23,9 +23,7 @@
 </head>
 
 <body>
-    
     <div id="app" data-endpoint="{{endpoint}}" v-cloak>
-            <i-button type="primary" @click="open(false)">Open notice</i-button>
         <Row>
             <i-col span="15">
                 <Card :dis-hover="true" :bordered="false">
@@ -136,12 +134,29 @@
                         </Row>
                         </form-item>
                         <form-item>
-                            <i-button :disabled="isProcessing" type="primary" @click="send()"> {{ isProcessing ? 'A previous simulation is in progress, please wait...' : 'Start simulation'}}</i-button>
+                            <i-button :disabled="status.isProcessing" type="primary" @click="send()"> {{ status.isProcessing ? 'A previous simulation is in progress, please wait...' : 'Start simulation'}}</i-button>
                         </form-item>
                     </i-form>
                 </Card>
             </i-col>
         </Row>
+        <Modal v-model="status.isProcessing" width="360" :mask-closable="false" :closable="false">
+            <p slot="header" style="text-align:center">
+                <Icon type="ios-information-circle"></Icon>
+                <span>A simulation is in progress...</span>
+            </p>
+            <div style="text-align:center">
+                <p>The simulator has already sent {{status.numberOfSentMessage}} of the {{status.numberOfTotalMessage}} message(s).</p>
+                <p>{{status.numberOfSuccessfulMessage}} of them are successfully sent.</p>
+                <i-progress
+                :percent="Math.round(this.status.numberOfSentMessage / this.status.numberOfTotalMessage * 100)"
+                :success-percent="Math.round(this.status.numberOfSuccessfulMessage / this.status.numberOfTotalMessage * 100)">
+                </i-progress>
+            </div>
+            <div slot="footer">
+                <i-button type="error" size="large" long @click="progressCancel">Cancel</i-button>
+            </div>
+        </Modal>
     </div>
     <!-- The loading sequence is critical, iview.js must be executed before main.js,
         otherwise unexpected placeholder will show on the page before they get properly rendered -->

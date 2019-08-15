@@ -102,7 +102,6 @@ const app = new Vue({
               dummyJsonArea: '',
               generatedMessage: '',
             },
-            isProcessing: false,
             endpoint: document.getElementById('app').getAttribute('data-endpoint'),
             ruleValidation: {
               numbers: [
@@ -136,35 +135,18 @@ const app = new Vue({
         try {
           await this.getIoTHubHostName();
           await this.getInputDeviceList();
-          await this.tryLatestProcessingStatus();
+          await this.polling();
         } catch (error) {
             this.errorMessageInitialization = error.toString();
         }
     },
     methods: {
-      async polling() {
-        await axios.get(`${this.endpoint}/api/polling`)
-        .then((res) => {
-          this.status.numberOfSentMessage = res.data.numberOfSentMessage;
-          this.status.numberOfSuccessfulMessage = res.data.numberOfSuccessfulMessage;
-          this.status.numberOfTotalMessage = res.data.numberOfTotalMessage;
-        })
-        .catch((err) => {
-
-        });
-      },
-        async getProcessingStatus() {
-          this.isProcessing = (await axios.get(`${this.endpoint}/api/isprocessing`)).data;
-        },
-        // if the simulation is in processing, and user close the webview
-        // next time he/she opens it again, the sending status will remain 'processing', but cannot refresh itself
-        // this function aims at trying to get status every second, if isProcessing=true when the page is loaded
-        async tryLatestProcessingStatus() {
-          await this.getProcessingStatus();
-          await this.polling();
-          // if (this.isProcessing) {
-            setTimeout(this.tryLatestProcessingStatus, 1000);
-          // }
+        async polling() {
+          await axios.get(`${this.endpoint}/api/polling`)
+          .then((res) => {
+            this.status = res.data
+          });
+          setTimeout(this.polling, 500);
         },
         async getIoTHubHostName () {
           this.hostName = (await axios.get(`${this.endpoint}/api/getiothubhostname`)).data;
@@ -203,23 +185,8 @@ const app = new Vue({
                         interval: intervalInMilliSecond,
                         messageType: this.messageType,
                         messageBody: this.messageBody
-                    }
-                    const toProcess = {
-                      processing: true
-                    }
-                    const doneProcess = {
-                      processing: false
-                    }
-                    this.open();
-                    await axios.post(`${this.endpoint}/api/setprocessing`, toProcess)
-                      .then((res) => {
-                        this.isProcessing = res.data;
-                      })
+                    };
                     await axios.post(`${this.endpoint}/api/send`, data);
-                    await axios.post(`${this.endpoint}/api/setprocessing`, doneProcess)
-                      .then((res) => {
-                        this.isProcessing = res.data;
-                      })
                 }
               });
         },
@@ -254,36 +221,10 @@ const app = new Vue({
             this.formItem.message = this.textArea.plainTextArea;
           }
         },
-        async f () {
-          this.status.numberOfSentMessage = 30;
-        },
-        open (nodesc) {
-          this.$Message.loading({
-              duration: 0,
-              closable: false,
-              render: h => {
-                return h('div', [
-                    h('p',
-                    `The simulator has already sent ${this.status.numberOfSentMessage} of the ${this.status.numberOfTotalMessage} message(s).
-                    ${this.status.numberOfSuccessfulMessage} of them are successfully sent.`,
-                    ),
-                    h('Progress', {
-                      props: {
-                        percent: Math.round(this.status.numberOfSentMessage / this.status.numberOfTotalMessage * 100),
-                        'success-percent': Math.round(this.status.numberOfSuccessfulMessage / this.status.numberOfTotalMessage * 100)
-                      }
-                    }),
-                    h('Button', {
-                      on: {
-                        click: this.close
-                      }
-                    }, 'Cancel'),
-                  ])
-            }
-          });
-      },
-      close() {
-        this.$Message.destroy();
+      async progressCancel() {
+        await axios.post(`${this.endpoint}/api/cancel`, {
+          cancel: true
+        });
       }
     }
 });
