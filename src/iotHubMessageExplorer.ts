@@ -44,7 +44,7 @@ export class IoTHubMessageExplorer extends IoTHubMessageBaseExplorer {
         });
     }
 
-    public async sendD2CMessageFromMultipleDevicesRepeatedlyWithProgressBar(deviceConnectionStrings: string[], template: string, numbers: number, interval: number) {
+    public async sendD2CMessageFromMultipleDevicesRepeatedlyWithProgressBar(deviceConnectionStrings: string[], template: string, isTemplate: boolean, numbers: number, interval: number) {
         const deviceCount = deviceConnectionStrings.length;
         const total = deviceCount * numbers;
         if (total <= 0) {
@@ -76,8 +76,10 @@ export class IoTHubMessageExplorer extends IoTHubMessageBaseExplorer {
                 // No await here, beacause the interval should begin as soon as it called send(), not after it sent.
                 ids.map((j) => {
                     // We use a template so that each time the message can be randomly generated.
-                    this.sendD2CMessageCoreWithProgress(clients[j], dummyjson.parse(template), statuses[j], totalStatus)
-                });
+                    const generatedMessage = isTemplate ? dummyjson.parse(template) : template;
+                    console.log(generatedMessage)
+                    this.sendD2CMessageCoreWithProgress(clients[j], generatedMessage, statuses[j], totalStatus);
+                }); 
                 if (token.isCancellationRequested) {
                     break;
                 }

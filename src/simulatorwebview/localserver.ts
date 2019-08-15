@@ -160,7 +160,7 @@ export class LocalServer {
             const messageType = data.messageType;
             const messageBody = data.messageBody;
             const deviceConnectionStrings: string[] = data.deviceConnectionStrings;
-            let message: string = data.message;
+            let template: string = data.message;
             const numbers: number = Number(data.numbers);
             const interval: number = Number(data.interval);
             switch (messageType) {
@@ -170,10 +170,10 @@ export class LocalServer {
                 case "Text Content":
                     switch (messageBody) {
                         case "Dummy Json":
-                            message = dummyjson.parse(data.message);
+                            await this._simulator.sendD2CMessage(deviceConnectionStrings, template, true, numbers, interval);
                             break;
-                        // case 'Plain Text':
-                        //     // Nothing to do
+                        case 'Plain Text':
+                            await this._simulator.sendD2CMessage(deviceConnectionStrings, template, false, numbers, interval);
                         default:
                             break;
                     }
@@ -181,7 +181,6 @@ export class LocalServer {
                 default:
                     break;
             }
-            await this._simulator.sendD2CMessage(deviceConnectionStrings, message, numbers, interval);
         } catch (err) {
             next(err);
         }
