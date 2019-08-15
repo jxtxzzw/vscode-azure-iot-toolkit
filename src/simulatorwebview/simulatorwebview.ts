@@ -64,6 +64,10 @@ export class SimulatorWebview {
                 this.localServer.stopServer();
             });
         } else {
+            /**
+             * if not in progress, and triggered with device, then restrat server
+             * else, show wrong message
+             */
             this.panel.reveal();
         }
     }
