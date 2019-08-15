@@ -90,14 +90,18 @@ const app = new Vue({
             inputDeviceList: [],
             formItem: {
                 deviceConnectionStrings: [],
-                message: plainTextTemplate,
+                message: '',
                 numbers: '10',
                 interval: '1',
             },
             intervalUnit: 'second',
             messageType: 'Text Content',
             messageBody: 'Plain Text',
-            generatedMessage: '',
+            textArea: {
+              plainTextArea: '',
+              dummyJsonArea: '',
+              generatedMessage: '',
+            },
             isProcessing: false,
             endpoint: document.getElementById('app').getAttribute('data-endpoint'),
             ruleValidation: {
@@ -202,33 +206,34 @@ const app = new Vue({
         },
         messageBodyChange (name) {
           this.messageBody = name;
-          // The input area will be replaced with template only when the content is empty or default.
-          // If user makes any change, we will keep the change.
-          if (name === 'Dummy Json') {
-            if (this.formItem.message === '' || this.formItem.message === plainTextTemplate) {
-              this.formItem.message = dummyJsonTemplate;
-            }
-          } else if (name === 'Plain Text') {
-            if (this.formItem.message === '' || this.formItem.message === dummyJsonTemplate) {
-              this.formItem.message = plainTextTemplate;
-            }
+          // If user clicks on 'Plain Text', the 'Preview' panel bacomes meaningless.
+          // So we hide it, and (if user was on 'Preview', we) make the panel focus on 'Write' again.
+          if (name === 'Plain Text') {
             this.messageInputAreaTab = 'Write';
           }
         },
         async generateDummyJson () {
           const template = {
-            template: this.formItem.message
+            template: this.textArea.dummyJsonArea
           };
           const validated = await axios.post(`${this.endpoint}/api/generaterandomjson`, template)
           .then((res) => {
-              this.generatedMessage = res.data;
+              this.textArea.generatedMessage = res.data;
               return true;
           })
           .catch((err) => {
-            this.generatedMessage = 'Malformed dummy json syntax.';
+            this.textArea.generatedMessage = 'Malformed dummy json syntax.';
             return false;
           })
           return validated;
+        },
+        async textAreaOnChange () {
+          if (this.messageBody === 'Dummy Json') {
+            this.formItem.message = this.textArea.dummyJsonArea;
+            await this.generateDummyJson();
+          } else if (this.messageBody === 'Plain Text') {
+            this.formItem.message = this.textArea.plainTextArea;
+          }
         },
         async f () {
           await Promise.reject('aaa');
