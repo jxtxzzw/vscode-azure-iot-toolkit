@@ -123,14 +123,19 @@ const app = new Vue({
                   { required: true, type: 'array', min: 1, message: 'Choose at least one device', trigger: 'change' }
                 ]
             },
-            messageInputAreaTab: 'Write'
+            messageInputAreaTab: 'Write',
+            status: {
+              numberOfSentMessage: 0,
+              numberOfSuccessfulMessage: 0,
+              isProcessing: false
+            }
         }
     },
     async mounted () {
         try {
-          await this.tryLatestProcessingStatus();
           await this.getIoTHubHostName();
           await this.getInputDeviceList();
+          await this.tryLatestProcessingStatus();
         } catch (error) {
             this.errorMessageInitialization = error.toString();
         }
@@ -236,36 +241,29 @@ const app = new Vue({
           }
         },
         async f () {
-          await Promise.reject('aaa');
+          this.status.numberOfSentMessage = 30;
         },
         open (nodesc) {
           this.$Message.loading({
               duration: 0,
               closable: false,
               render: h => {
-                return h('span', [
-                    'This is created by ',
-                    h('a', 'render'),
-                    ' function',
-                    h('Button', {
-                      props: {
-                        type: 'primary'
-                      }
-                    }, 'aaa'),
-                    h('Button', {
-                      props: {
-                        type: 'primary'
-                      }
-                    }, 'aaa'),
+                return h('div', [
                     h('Progress', {
                       props: {
-                        percent: '40',
-                        'success-percent': '30'
+                        percent: this.status.numberOfSentMessage,
+                        'success-percent': this.status.numberOfSuccessfulMessage
                       }
-                    })
+                    }),
+                    'The simulator has already sent ' + this.status.numberOfSentMessage + ' message(s)' +
+                      this.status.numberOfSuccessfulMessage + ' of them are successfully sent.'
                 ])
             }
           });
+          setTimeout(this.f, 1000);
+      },
+      async polling () {
+
       }
     }
 });

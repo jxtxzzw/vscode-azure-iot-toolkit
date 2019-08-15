@@ -6,11 +6,11 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { Constants } from  "../constants";
-import { IoTHubResourceExplorer } from "../iotHubResourceExplorer";
 import { DeviceItem } from "../Model/DeviceItem";
-import { Simulator } from "../simulator";
 import { Utility } from "../utility";
 import { LocalServer } from "./localserver";
+import { Simulator } from "../simulator";
+
 
 const simulatorWebviewPanelViewType = "IoT Device Simulator";
 const simulatorWebviewPanelViewTitle = "IoT Device Simulator";
@@ -34,9 +34,7 @@ export class SimulatorWebview {
     public async openSimulatorWebviewPage(deviceItem: DeviceItem): Promise<any> {
         const iotHubConnectionString = await Utility.getConnectionString(Constants.IotHubConnectionStringKey, Constants.IotHubConnectionStringTitle, false);
         if (!iotHubConnectionString) {
-            let outputChannel = Simulator.getSimulatorOutputChannel();
-            const _IoTHubResourceExplorer = new IoTHubResourceExplorer(outputChannel);
-            await _IoTHubResourceExplorer.selectIoTHub();
+            await Simulator.getInstance().selectIoTHub();
         }
         if (!iotHubConnectionString) {
             return;

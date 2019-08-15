@@ -24,7 +24,7 @@ export class LocalServer {
         this.initApp();
         this.server = http.createServer(this.app);
         this.context = context;
-        this._simulator = new Simulator(this.context);
+        this._simulator = Simulator.getInstance(this.context);
         this.preSelectedDevice = undefined;
     }
 
@@ -53,6 +53,7 @@ export class LocalServer {
         this.router.get("/api/getiothubhostname", async(req, res, next) => await this.getIoTHubHostName(req, res, next));
         this.router.get("/api/isprocessing", async(req, res, next) => await this.isProcessing(req, res, next));
         this.router.get("/api/getpreselected", async(req, res, next) => await this.getPreSelected(req, res, next));
+        this.router.get("/api/polling", async(req, res, next) => await this.polling(req, res, next));
         this.router.post("/api/send", async(req, res, next) => await this.send(req, res, next));
         this.router.post("/api/generaterandomjson", async(req, res, next) => await this.generateRandomJson(req, res, next));
         this.router.post("/api/setprocessing", async(req, res, next) => await this.setProcessing(req, res, next));
@@ -98,7 +99,7 @@ export class LocalServer {
 
     private async isProcessing(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
-            const processing = await Simulator.isProcessing();
+            const processing = await this._simulator.isProcessing();
             return res.status(200).json(processing);
         } catch (err) {
             next(err);
@@ -109,7 +110,7 @@ export class LocalServer {
         try {
             const data = req.body;
             const processing = data.processing;
-            Simulator.setProcessing(processing);
+            this._simulator.setProcessing(processing);
             return res.status(200).json(processing);
         } catch (err) {
             next(err);
@@ -117,6 +118,14 @@ export class LocalServer {
     }
 
     private async persistInputs(req: express.Request, res: express.Response, next: express.NextFunction) {
+        try {
+            // TODO
+        } catch (err) {
+            next(err);
+        }
+    }
+
+    private async polling(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
             // TODO
         } catch (err) {
@@ -136,7 +145,7 @@ export class LocalServer {
 
     private async getInputDeviceList(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
-            const list = await Simulator.getInputDeviceList();
+            const list = await this._simulator.getInputDeviceList();
             return res.status(200).json(list);
         } catch (err) {
             next(err);

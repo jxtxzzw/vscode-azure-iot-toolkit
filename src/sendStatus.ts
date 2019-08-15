@@ -24,10 +24,10 @@ export class SendStatus {
         return this.total;
     }
 
-    public AddSucceed(): void {
+    public addSucceed(): void {
         this.succeed++;
     }
-    public AddFailed(): void {
+    public addFailed(): void {
         this.failed++;
     }
 

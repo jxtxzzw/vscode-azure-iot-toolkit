@@ -56,7 +56,7 @@ export class AzureIoTExplorer {
         this._codeManager = new CodeManager(this.context);
         this._iotHubModuleExplorer = new IotHubModuleExplorer(outputChannel);
         this._eventHubManager = new EventHubManager(outputChannel);
-        this._simulator = new Simulator(context);
+        this._simulator = Simulator.getInstance(this.context);
     }
 
     public sendD2CMessage(deviceItem?: DeviceItem): void {
