@@ -54,6 +54,7 @@ export class LocalServer {
         this.router.get("/api/getiothubhostname", async(req, res, next) => await this.getIoTHubHostName(req, res, next));
         this.router.get("/api/getpreselected", async(req, res, next) => await this.getPreSelected(req, res, next));
         this.router.get("/api/polling", async(req, res, next) => await this.polling(req, res, next));
+        this.router.get("/api/getpersistedinputs", async(req, res, next) => await this.getPersistedInputs(req, res, next));
         this.router.post("/api/send", async(req, res, next) => await this.send(req, res, next));
         this.router.post("/api/generaterandomjson", async(req, res, next) => await this.generateRandomJson(req, res, next));
         this.router.post("/api/cancel", async(req, res, next) => await this.cancel(req, res, next));
@@ -120,11 +121,20 @@ export class LocalServer {
         }
     }
 
+    private async getPersistedInputs(req: express.Request, res: express.Response, next: express.NextFunction) {
+        try {
+            const result = this._simulator.getPersistedInputs();
+            res.status(200).json(result);
+        } catch (err) {
+            next(err);
+        }
+    }
+
     private async polling(req: express.Request, res: express.Response, next: express.NextFunction) {
         try {
             const status: SendStatus = this._simulator.getStatus();
             const result = {
-                numberOfSentMessage: status ? status.sum() : 0,
+                numberOfSentMessage: status ? status.getSent() : 0,
                 numberOfSuccessfulMessage: status ? status.getSucceed() : 0,
                 numberOfTotalMessage: status ? status.getTotal() : 0,
                 isProcessing: this._simulator.isProcessing()

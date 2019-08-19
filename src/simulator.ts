@@ -160,7 +160,8 @@ export class Simulator {
                 const generatedMessage = isTemplate ? dummyjson.parse(template) : template;
                 console.log(generatedMessage)
                 this.sendD2CMessageCore(clients[j], generatedMessage, statuses[j], this.totalStatus);
-            }); 
+            });
+            this.totalStatus.addSent(deviceCount);
             if (this.cancelToken) {
                 break;
             }

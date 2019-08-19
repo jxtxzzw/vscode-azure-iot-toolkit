@@ -135,12 +135,26 @@ const app = new Vue({
         try {
           await this.getIoTHubHostName();
           await this.getInputDeviceList();
+          await this.getPersistedInputs();
           await this.polling();
         } catch (error) {
             this.errorMessageInitialization = error.toString();
         }
     },
     methods: {
+      async getPersistedInputs() {
+        await axios.get(`${this.endpoint}/api/getpersistedinputs`)
+        .then(async (res) => {
+          const data = res.data;
+          this.formItem.numbers = data.numbers;
+          this.formItem.interval = data.interval;
+          this.intervalUnit = data.intervalUnit;
+          this.messageBody = data.messageBody;
+          this.textArea.plainTextArea = data.plainTextArea;
+          this.textArea.dummyJsonArea = data.dummyJsonArea;
+          await this.textAreaOnChange();
+        });
+      },
         async polling() {
           await axios.get(`${this.endpoint}/api/polling`)
           .then((res) => {
