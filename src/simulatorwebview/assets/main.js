@@ -143,10 +143,10 @@ const app = new Vue({
     },
     async mounted () {
         try {
+          await this.polling();
           await this.getIoTHubHostName();
           await this.getInputDeviceList();
           await this.getPersistedInputs();
-          await this.polling();
         } catch (error) {
             this.errorMessageInitialization = error.toString();
         }

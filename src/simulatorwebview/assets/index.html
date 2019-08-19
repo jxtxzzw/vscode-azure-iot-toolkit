@@ -134,7 +134,7 @@
                         </Row>
                         </form-item>
                         <form-item>
-                            <i-button :disabled="status.isProcessing" type="primary" @click="send()"> {{ status.isProcessing ? 'A previous simulation is in progress, please wait...' : 'Start simulation'}}</i-button>
+                            <i-button :disabled="status.isProcessing" type="primary" @click="send()"> {{ status.isProcessing ? 'A previous simulation is in progress, please wait or cancel it.' : 'Start simulation'}}</i-button>
                         </form-item>
                     </i-form>
                 </Card>

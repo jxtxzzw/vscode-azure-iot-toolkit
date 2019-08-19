@@ -68,10 +68,30 @@ export class Simulator {
         this.cancelToken = true;
     }
     
-    public async showWebview(deviceItem: DeviceItem): Promise<void> {
+    private async showWebview(deviceItem: DeviceItem, forceReload: boolean): Promise<void> {
         const simulatorwebview = SimulatorWebview.getInstance(this.context);
-        await simulatorwebview.openSimulatorWebviewPage(deviceItem);
+        await simulatorwebview.showWebview(deviceItem, forceReload);
         return;
+    }
+
+    public async launch(deviceItem: DeviceItem): Promise<void> {
+        if (this.isProcessing()) {
+            vscode.window.showErrorMessage('A previous simulation is in progress, please wait or cancel it.')
+            await this.showWebview(undefined, false);
+        } else {
+            if (deviceItem) {
+                await this.showWebview(deviceItem, true);
+            } else {
+                const iotHubConnectionString = await Utility.getConnectionString(Constants.IotHubConnectionStringKey, Constants.IotHubConnectionStringTitle, false);
+                if (!iotHubConnectionString) {
+                    await Simulator.getInstance().selectIoTHub();
+                }
+                if (!iotHubConnectionString) {
+                    return;
+                }
+                await this.showWebview(undefined, false);
+            }
+        }
     }
 
     public async sendD2CMessage(deviceConnectionStrings: string[], template: string, isTemplate: boolean, numbers: number, interval: number) {
@@ -82,7 +102,7 @@ export class Simulator {
             // The cancel token can only be re-initialized out of any send() or delay() functions.
             this.cancelToken = false;
         } else {
-            vscode.window.showErrorMessage('A previous simulation is in progress...');
+            vscode.window.showErrorMessage('A previous simulation is in progress, please wait or cancel it.');
         }
     }
 

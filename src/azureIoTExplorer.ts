@@ -204,7 +204,7 @@ export class AzureIoTExplorer {
     }
 
     public async showSimulatorWebview(deviceItem: DeviceItem) {
-        await this._simulator.showWebview(deviceItem);
+        await this._simulator.launch(deviceItem);
     }
 
 }

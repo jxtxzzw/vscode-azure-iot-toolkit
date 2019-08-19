@@ -31,17 +31,17 @@ export class SimulatorWebview {
         this.localServer = new LocalServer(context);
     }
 
-    public async openSimulatorWebviewPage(deviceItem: DeviceItem): Promise<any> {
-        const iotHubConnectionString = await Utility.getConnectionString(Constants.IotHubConnectionStringKey, Constants.IotHubConnectionStringTitle, false);
-        if (!iotHubConnectionString) {
-            await Simulator.getInstance().selectIoTHub();
+    public async showWebview(deviceItem: DeviceItem, forceReload: boolean) {
+        if (forceReload && this.panel) {
+            this.panel.dispose();
         }
-        if (!iotHubConnectionString) {
-            return;
-        }
-        this.localServer.setPreSelectedDevice(deviceItem);
+        await this.openSimulatorWebviewPage(deviceItem);
+    }
+
+    private async openSimulatorWebviewPage(deviceItem: DeviceItem): Promise<any> {
         if (!this.panel) {
             this.localServer.startServer();
+            this.localServer.setPreSelectedDevice(deviceItem);
             this.panel = vscode.window.createWebviewPanel(
                 simulatorWebviewPanelViewType,
                 simulatorWebviewPanelViewTitle,
@@ -52,22 +52,16 @@ export class SimulatorWebview {
                     retainContextWhenHidden: true,
                 },
             );
-
             let html = fs.readFileSync(this.context.asAbsolutePath(path.join("src", "simulatorwebview", "assets", "index.html")), "utf8");
             html = html
                 .replace(/{{root}}/g, vscode.Uri.file(this.context.asAbsolutePath(".")).with({ scheme: "vscode-resource" }).toString())
                 .replace(/{{endpoint}}/g, this.localServer.getServerUri());
             this.panel.webview.html = html;
-
             this.panel.onDidDispose(() => {
                 this.panel = undefined;
                 this.localServer.stopServer();
             });
         } else {
-            /**
-             * if not in progress, and triggered with device, then restrat server
-             * else, show wrong message
-             */
             this.panel.reveal();
         }
     }
