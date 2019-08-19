@@ -5,12 +5,7 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { Constants } from  "../constants";
-import { DeviceItem } from "../Model/DeviceItem";
-import { Utility } from "../utility";
 import { LocalServer } from "./localserver";
-import { Simulator } from "../simulator";
-
 
 const simulatorWebviewPanelViewType = "IoT Device Simulator";
 const simulatorWebviewPanelViewTitle = "IoT Device Simulator";

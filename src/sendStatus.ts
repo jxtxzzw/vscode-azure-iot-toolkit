@@ -28,7 +28,7 @@ export class SendStatus {
     public getFailed(): number {
         return this.failed;
     }
-    
+
     public addSent(deviceCount: number): void {
         this.sent += deviceCount;
     }

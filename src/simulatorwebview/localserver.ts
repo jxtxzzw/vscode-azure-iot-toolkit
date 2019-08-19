@@ -1,15 +1,12 @@
-import { ConnectionString } from "azure-iot-common";
 import * as bodyParser from "body-parser";
 import * as dummyjson from "dummy-json";
 import * as express from "express";
 import * as http from "http";
 import { AddressInfo } from "net";
 import * as vscode from "vscode";
-import { Constants } from "../constants";
 import { DeviceItem } from "../Model/DeviceItem";
-import { Simulator } from "../simulator";
-import { Utility } from "../utility";
 import { SendStatus } from "../sendStatus";
+import { Simulator } from "../simulator";
 
 export class LocalServer {
     private app: express.Express;
@@ -128,8 +125,8 @@ export class LocalServer {
                 numberOfSuccessfulMessage: status ? status.getSucceed() : 0,
                 numberOfFailedMessage: status ? status.getFailed() : 0,
                 numberOfTotalMessage: status ? status.getTotal() : 0,
-                isProcessing: this._simulator.isProcessing()
-            }
+                isProcessing: this._simulator.isProcessing(),
+            };
             return res.status(200).json(result);
         } catch (err) {
             next(err);
@@ -174,7 +171,7 @@ export class LocalServer {
                         case "Dummy Json":
                             await this._simulator.sendD2CMessage(deviceConnectionStrings, template, true, numbers, interval);
                             break;
-                        case 'Plain Text':
+                        case "Plain Text":
                             await this._simulator.sendD2CMessage(deviceConnectionStrings, template, false, numbers, interval);
                         default:
                             break;
