@@ -141,30 +141,30 @@
                 </Card>
             </i-col>
         </Row>
-        <Modal v-model="status.isProcessing" width="360" :mask-closable="false" :closable="false">
+        <Modal v-model="status.isProcessing" width="380" :mask-closable="false" :closable="false">
             <p slot="header" style="text-align:center">
                 <Icon type="ios-information-circle"></Icon>
                 <span>A simulation is in progress...</span>
             </p>
             <div style="text-align:center">
-                <p>The simulator has already sent {{status.numberOfSentMessage}} of the {{status.numberOfTotalMessage}} message(s).</p>
-                <p>{{status.numberOfSuccessfulMessage}} of them are successfully sent,
-                     {{status.numberOfFailedMessage}} of them are failed.
-                     The status of the remaining messages is still pending.</p>
-                <!-- The progress bar will turn to successful status if the percent equals 100.
-                In most cases, we can just let it turn to green and within very little time the successful count will be equal to the sent message number.
-                But if there is a network problem, or the device is deleted, since the timeout is too long, we have no other solution but to block the progress bar at 99%. -->
+                <p>The simulator has already sent <b>{{status.numberOfSentMessage}}</b> of the {{status.numberOfTotalMessage}} message(s).</p>
                 <i-progress
-                :percent="Math.round(this.status.numberOfSentMessage / this.status.numberOfTotalMessage * 100) == 100 ? 
-                (this.status.numberOfSuccessfulMessage + this.status.numberOfFailedMessage == this.status.numberOfSentMessage ? 100 : 99) 
-                : Math.round(this.status.numberOfSentMessage / this.status.numberOfTotalMessage * 100)"
-                :success-percent="Math.round(this.status.numberOfSuccessfulMessage / this.status.numberOfTotalMessage * 100)">
+                status="active"
+                :percent="Math.round(this.status.numberOfSentMessage / this.status.numberOfTotalMessage * 100)">
                 </i-progress>
-                <p v-if="this.status.numberOfSentMessage == this.status.numberOfTotalMessage && status.isProcessing">
-                    All message(s) are sent.
-                     Please wait for a while so we can collect the send status information.
-                      <b>It takes longer than expected.</b>
-                </p>
+                <p><b>{{status.numberOfSuccessfulMessage}}</b> of them are successfully sent:</p>
+                <i-progress
+                stroke-color="#19be6b"
+                hide-info
+                :percent="Math.round(this.status.numberOfSuccessfulMessage / this.status.numberOfTotalMessage * 100)">
+                </i-progress>
+                <p><b>{{status.numberOfFailedMessage}}</b> of them are failed:</p>
+                <i-progress
+                stroke-color="#ed4014"
+                hide-info
+                :percent="Math.round(this.status.numberOfFailedMessage / this.status.numberOfTotalMessage * 100)">
+                </i-progress>
+                <p>The status of the remaining messages is still pending.</p>
             </div>
             <div slot="footer">
                 <i-button type="error" size="large" long @click="progressCancel">Cancel</i-button>
