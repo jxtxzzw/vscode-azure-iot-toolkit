@@ -47,6 +47,16 @@ const introductionTemplate = `This page is intended to help you quickly send D2C
 You only need to specify the device, the number of times, the delivery interval, and the data template.
 We will randomly generate data in your specified format for you and send it out.`
 
+const defaultValue = {
+  numbers: '10',
+  interval: '1',
+  intervalUnit: 'second',
+  messageType: 'Text Content',
+  messageBody: 'Plain Text',
+  plainTextArea: plainTextTemplate,
+  dummyJsonArea: dummyJsonTemplate
+}
+
 const app = new Vue({
     el: '#app',
     data () { 
@@ -146,12 +156,12 @@ const app = new Vue({
         await axios.get(`${this.endpoint}/api/getpersistedinputs`)
         .then(async (res) => {
           const data = res.data;
-          this.formItem.numbers = data.numbers;
-          this.formItem.interval = data.interval;
-          this.intervalUnit = data.intervalUnit;
-          this.messageBody = data.messageBody;
-          this.textArea.plainTextArea = data.plainTextArea;
-          this.textArea.dummyJsonArea = data.dummyJsonArea;
+          this.formItem.numbers = (data.numbers && data.numbers !== '') ? data.numbers : defaultValue.numbers;
+          this.formItem.interval = (data.interval && data.interval !== '') ? data.interval : defaultValue.interval;
+          this.intervalUnit = (data.intervalUnit && data.intervalUnit !== '') ? data.intervalUnit : defaultValue.intervalUnit;
+          this.messageBody = (data.messageBody && data.messageBody !== '') ? data.messageBody : defaultValue.messageBody;
+          this.textArea.plainTextArea = (data.plainTextArea && data.plainTextArea !== '') ? data.plainTextArea : defaultValue.plainTextArea;
+          this.textArea.dummyJsonArea = (data.dummyJsonArea && DataTransfer.dummyJsonArea !== '') ? data.dummyJsonArea : defaultValue.dummyJsonArea;
           await this.textAreaOnChange();
         });
       },
