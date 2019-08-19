@@ -31,17 +31,16 @@ export class SimulatorWebview {
         this.localServer = new LocalServer(context);
     }
 
-    public async showWebview(deviceItem: DeviceItem, forceReload: boolean) {
+    public async showWebview(forceReload: boolean) {
         if (forceReload && this.panel) {
             this.panel.dispose();
         }
-        await this.openSimulatorWebviewPage(deviceItem);
+        await this.openSimulatorWebviewPage();
     }
 
-    private async openSimulatorWebviewPage(deviceItem: DeviceItem): Promise<any> {
+    private async openSimulatorWebviewPage(): Promise<any> {
         if (!this.panel) {
             this.localServer.startServer();
-            this.localServer.setPreSelectedDevice(deviceItem);
             this.panel = vscode.window.createWebviewPanel(
                 simulatorWebviewPanelViewType,
                 simulatorWebviewPanelViewTitle,

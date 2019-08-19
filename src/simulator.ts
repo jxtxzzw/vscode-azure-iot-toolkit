@@ -24,12 +24,14 @@ export class Simulator {
     private cancelToken: boolean;
     private totalStatus: SendStatus;
     private persistedInputs: {
-        numbers: '',
-        interval: '',
-        intervalUnit: '',
-        messageBody: '',
-        plainTextArea: '',
-        dummyJsonArea: ''
+        hostName: string,
+        deviceConnectionStrings: string[],
+        numbers: string,
+        interval: string,
+        intervalUnit: string,
+        messageBody: string,
+        plainTextArea: string,
+        dummyJsonArea: string
     }
 
     private constructor(context: vscode.ExtensionContext) {
@@ -37,6 +39,16 @@ export class Simulator {
         this.outputChannel = vscode.window.createOutputChannel(Constants.SimulatorOutputChannelTitle);
         this.processing = false;
         this.cancelToken = false;
+        this.persistedInputs = {
+            hostName: '',
+            deviceConnectionStrings: [],
+            numbers: '',
+            interval: '',
+            intervalUnit: '',
+            messageBody: '',
+            plainTextArea: '',
+            dummyJsonArea: ''
+        }
     }
 
     public static getInstance(context?: vscode.ExtensionContext) {
@@ -67,29 +79,51 @@ export class Simulator {
     public cancel() {
         this.cancelToken = true;
     }
+
+    private setPreSelectedHostName(hostName: string) {
+        this.persistedInputs.hostName = hostName;
+    }
+
+    private setPreSelectedDeviceConnectionStrings(deviceConnectionStrings: string[]) {
+        this.persistedInputs.deviceConnectionStrings = deviceConnectionStrings;
+    }
     
-    private async showWebview(deviceItem: DeviceItem, forceReload: boolean): Promise<void> {
+    private async showWebview(forceReload: boolean, hostName?: string, deviceConnectionStrings?: string[]): Promise<void> {
         const simulatorwebview = SimulatorWebview.getInstance(this.context);
-        await simulatorwebview.showWebview(deviceItem, forceReload);
+        if (hostName) {
+            await this.setPreSelectedHostName(hostName);
+        }
+        if (deviceConnectionStrings) {
+            await this.setPreSelectedDeviceConnectionStrings(deviceConnectionStrings);
+        }
+        await simulatorwebview.showWebview(forceReload);
         return;
     }
 
     public async launch(deviceItem: DeviceItem): Promise<void> {
+        
+        let deviceConnectionStrings = [];
         if (this.isProcessing()) {
-            vscode.window.showErrorMessage('A previous simulation is in progress, please wait or cancel it.')
-            await this.showWebview(undefined, false);
+            vscode.window.showInformationMessage('A previous simulation is in progress, please wait or cancel it.')
+            await this.showWebview(false);
         } else {
+            let iotHubConnectionString = await Utility.getConnectionString(Constants.IotHubConnectionStringKey, Constants.IotHubConnectionStringTitle, false);
             if (deviceItem) {
-                await this.showWebview(deviceItem, true);
+                const hostName = ConnectionString.parse(iotHubConnectionString).HostName;
+                const hostNamePersisted = this.persistedInputs.hostName;
+                deviceConnectionStrings.push(deviceItem.connectionString);
+                const deviceConnectionStringsPersisted = this.persistedInputs.deviceConnectionStrings;
+                await this.showWebview((hostName !== hostNamePersisted || deviceConnectionStrings !== deviceConnectionStringsPersisted), hostName, deviceConnectionStrings);
             } else {
-                const iotHubConnectionString = await Utility.getConnectionString(Constants.IotHubConnectionStringKey, Constants.IotHubConnectionStringTitle, false);
                 if (!iotHubConnectionString) {
                     await Simulator.getInstance().selectIoTHub();
                 }
                 if (!iotHubConnectionString) {
                     return;
                 }
-                await this.showWebview(undefined, false);
+                const hostName = ConnectionString.parse(iotHubConnectionString).HostName;
+                const hostNamePersisted = this.persistedInputs.hostName;
+                await this.showWebview(hostName !== hostNamePersisted, hostName, deviceConnectionStrings);
             }
         }
     }
@@ -206,7 +240,6 @@ export class Simulator {
 
     public persistInputs (persistedInputs) {
         this.persistedInputs = persistedInputs;
-        console.log(this.persistedInputs);
     }
 
     public getPersistedInputs() {

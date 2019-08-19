@@ -51,8 +51,6 @@ export class LocalServer {
     private initRouter() {
         this.router = express.Router();
         this.router.get("/api/getinputdevicelist", async(req, res, next) => await this.getInputDeviceList(req, res, next));
-        this.router.get("/api/getiothubhostname", async(req, res, next) => await this.getIoTHubHostName(req, res, next));
-        this.router.get("/api/getpreselected", async(req, res, next) => await this.getPreSelected(req, res, next));
         this.router.get("/api/polling", async(req, res, next) => await this.polling(req, res, next));
         this.router.get("/api/getpersistedinputs", async(req, res, next) => await this.getPersistedInputs(req, res, next));
         this.router.post("/api/send", async(req, res, next) => await this.send(req, res, next));
@@ -88,14 +86,6 @@ export class LocalServer {
               res.status(404).json({error: "I don\'t have that"});
             }
         });
-    }
-
-    private async getPreSelected(req: express.Request, res: express.Response, next: express.NextFunction) {
-        try {
-            return res.status(200).json(this.preSelectedDevice);
-        } catch (err) {
-            next(err);
-        }
     }
 
     private async cancel(req: express.Request, res: express.Response, next: express.NextFunction) {
@@ -139,16 +129,6 @@ export class LocalServer {
                 numberOfTotalMessage: status ? status.getTotal() : 0,
                 isProcessing: this._simulator.isProcessing()
             }
-            return res.status(200).json(result);
-        } catch (err) {
-            next(err);
-        }
-    }
-
-    private async getIoTHubHostName(req: express.Request, res: express.Response, next: express.NextFunction) {
-        try {
-            const iotHubConnectionString = await Utility.getConnectionString(Constants.IotHubConnectionStringKey, Constants.IotHubConnectionStringTitle, false);
-            const result = ConnectionString.parse(iotHubConnectionString).HostName;
             return res.status(200).json(result);
         } catch (err) {
             next(err);

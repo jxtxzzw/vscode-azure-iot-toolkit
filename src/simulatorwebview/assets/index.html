@@ -52,6 +52,7 @@
                                         filterable
                                         placeholder="Please select the device(s) you want to send message from..."
                                         not-found-text="No Device Found"
+                                        @on-change="persistInputs"
                                         >
                                         <i-option
                                             v-for="item in inputDeviceList"

@@ -144,7 +144,6 @@ const app = new Vue({
     async mounted () {
         try {
           await this.polling();
-          await this.getIoTHubHostName();
           await this.getInputDeviceList();
           await this.getPersistedInputs();
         } catch (error) {
@@ -156,6 +155,8 @@ const app = new Vue({
         await axios.get(`${this.endpoint}/api/getpersistedinputs`)
         .then(async (res) => {
           const data = res.data;
+          this.hostName = data.hostName;
+          this.formItem.deviceConnectionStrings = data.deviceConnectionStrings;
           this.formItem.numbers = (data.numbers && data.numbers !== '') ? data.numbers : defaultValue.numbers;
           this.formItem.interval = (data.interval && data.interval !== '') ? data.interval : defaultValue.interval;
           this.intervalUnit = (data.intervalUnit && data.intervalUnit !== '') ? data.intervalUnit : defaultValue.intervalUnit;
@@ -172,19 +173,12 @@ const app = new Vue({
           });
           setTimeout(this.polling, 500);
         },
-        async getIoTHubHostName () {
-          this.hostName = (await axios.get(`${this.endpoint}/api/getiothubhostname`)).data;
-        },
         async getInputDeviceList () {
             const list = (await axios.get(`${this.endpoint}/api/getinputdevicelist`)).data;
             this.inputDeviceList = []
             for (const device of list) {
                 device.key = device.connectionString;
                 this.inputDeviceList.push(device)
-            }
-            const preSelected = (await axios.get(`${this.endpoint}/api/getpreselected`)).data;
-            if (preSelected !== '') {
-              this.formItem.deviceConnectionStrings.push(preSelected.connectionString);
             }
         },
         async send () {
@@ -257,6 +251,8 @@ const app = new Vue({
       },
       async persistInputs() {
         const inputs = {
+          hostName: this.hostName,
+          deviceConnectionStrings: this.formItem.deviceConnectionStrings,
           numbers: this.formItem.numbers,
           interval: this.formItem.interval,
           intervalUnit: this.intervalUnit,
