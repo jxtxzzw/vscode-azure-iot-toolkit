@@ -126,6 +126,7 @@ export class LocalServer {
             const result = {
                 numberOfSentMessage: status ? status.getSent() : 0,
                 numberOfSuccessfulMessage: status ? status.getSucceed() : 0,
+                numberOfFailedMessage: status ? status.getFailed() : 0,
                 numberOfTotalMessage: status ? status.getTotal() : 0,
                 isProcessing: this._simulator.isProcessing()
             }

@@ -136,6 +136,7 @@ const app = new Vue({
             status: {
               numberOfSentMessage: 0,
               numberOfSuccessfulMessage: 0,
+              numberOfFailedMessage: 0,
               numberOfTotalMessage: 0,
               isProcessing: false
             }
