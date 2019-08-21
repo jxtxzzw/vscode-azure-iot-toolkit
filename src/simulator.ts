@@ -129,8 +129,10 @@ export class Simulator {
         const hostName = ConnectionString.parse(iotHubConnectionString)
           .HostName;
         const hostNamePersisted = this.persistedInputs.hostName;
+        const deviceConnectionStringsPersisted = this.persistedInputs
+          .deviceConnectionStrings;
         await this.showWebview(
-          hostName !== hostNamePersisted,
+          hostName !== hostNamePersisted || deviceConnectionStringsPersisted.length != 0,
           hostName,
           deviceConnectionStrings
         );
