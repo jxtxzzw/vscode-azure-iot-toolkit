@@ -153,24 +153,12 @@
                 <span>A simulation is in progress...</span>
             </p>
             <div style="text-align:center">
-                <p>The simulator has already sent <b>{{status.numberOfSentMessage}}</b> of the {{status.numberOfTotalMessage}} message(s).</p>
-                <i-progress
-                status="active"
-                :percent="Math.round(this.status.numberOfSentMessage / this.status.numberOfTotalMessage * 100)">
-                </i-progress>
-                <p><b>{{status.numberOfSuccessfulMessage}}</b> of them are successfully sent:</p>
-                <i-progress
-                stroke-color="#19be6b"
-                hide-info
-                :percent="Math.round(this.status.numberOfSuccessfulMessage / this.status.numberOfTotalMessage * 100)">
-                </i-progress>
-                <p><b>{{status.numberOfFailedMessage}}</b> of them are failed:</p>
-                <i-progress
-                stroke-color="#ed4014"
-                hide-info
-                :percent="Math.round(this.status.numberOfFailedMessage / this.status.numberOfTotalMessage * 100)">
-                </i-progress>
-                <p>The status of the remaining messages is still pending.</p>
+              <p><b>{{status.numberOfSuccessfulMessage}}</b> of them are successfully sent;</p>
+              <p><b>{{status.numberOfFailedMessage}}</b> of them are failed.</p>
+              <i-progress
+              status="active"
+              :percent="Math.round((this.status.numberOfSuccessfulMessage + this.status.numberOfFailedMessage) / this.status.numberOfTotalMessage * 100)">
+              </i-progress>
             </div>
             <div slot="footer">
                 <i-button type="error" size="large" long @click="progressCancel">Cancel</i-button>
