@@ -83,21 +83,20 @@
                                 </form-item>
                             </i-col>
                         </Row>
-                        <form-item prop="messageBody" label="Message Body">
+                        <form-item prop="message" label="Message" >
                             <Row>
                                 <i-col span="24">
                                     <radio-group v-model="messageBody" @on-change="messageBodyChange">
                                         <Radio label="Plain Text">Plain Text</Radio>
                                         <Radio label="Dummy Json">Dummy Json</Radio>
+                                        <a v-if="messageBody=='Dummy Json'" href="https://github.com/webroo/dummy-json">
+                                            Click here to see advanced usage.
+                                            <Icon type="md-open"></Icon>
+                                        </a>
                                     </radio-group>
                                 </i-col>
                             </Row>
-                        </form-item>
-                        <form-item prop="message" label="Message" >
-                            <a v-if="messageBody=='Dummy Json'" href="https://github.com/webroo/dummy-json">
-                                Click here to see advanced usage.
-                                <Icon type="md-open"></Icon>
-                            </a>
+                            
                         <Row>
                             <i-col span="24">
                                 <Tabs v-model="messageInputAreaTab" @on-click="textAreaOnChange" :animated="false">
