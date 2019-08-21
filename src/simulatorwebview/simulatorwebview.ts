@@ -7,8 +7,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { LocalServer } from "./localserver";
 
-const simulatorWebviewPanelViewType = "IoT Device Simulator";
-const simulatorWebviewPanelViewTitle = "IoT Device Simulator";
+const simulatorWebviewPanelViewType = "Send D2C Messages";
+const simulatorWebviewPanelViewTitle = "Send D2C Messages";
 
 export class SimulatorWebview {
     public static getInstance(context: vscode.ExtensionContext) {
