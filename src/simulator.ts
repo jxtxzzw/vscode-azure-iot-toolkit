@@ -92,9 +92,9 @@ export class Simulator {
   public async launch(deviceItem: DeviceItem): Promise<void> {
     let deviceConnectionStrings = [];
     if (this.isProcessing()) {
-      vscode.window.showInformationMessage(
-          "A previous simulation is in progress, please wait or cancel it.",
-      );
+      // vscode.window.showInformationMessage(
+      //     "A previous simulation is in progress, please wait or cancel it.",
+      // );
       await this.showWebview(false);
     } else {
       let iotHubConnectionString = await Utility.getConnectionString(
