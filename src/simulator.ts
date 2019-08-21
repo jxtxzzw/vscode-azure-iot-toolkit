@@ -97,39 +97,39 @@ export class Simulator {
       // );
       await this.showWebview(false);
     } else {
-      let iotHubConnectionString = await Utility.getConnectionString(
-          Constants.IotHubConnectionStringKey,
-          Constants.IotHubConnectionStringTitle,
-          false,
-      );
-      if (deviceItem) {
-        const hostName = ConnectionString.parse(iotHubConnectionString)
-            .HostName;
-        const hostNamePersisted = this.persistedInputs.hostName;
-        deviceConnectionStrings.push(deviceItem.connectionString);
-        const deviceConnectionStringsPersisted = this.persistedInputs
-            .deviceConnectionStrings;
-        await this.showWebview(
-            hostName !== hostNamePersisted ||
-            deviceConnectionStrings !== deviceConnectionStringsPersisted,
-            hostName,
-            deviceConnectionStrings,
+        let iotHubConnectionString = await Utility.getConnectionString(
+            Constants.IotHubConnectionStringKey,
+            Constants.IotHubConnectionStringTitle,
+            false,
         );
-      } else {
-        if (!iotHubConnectionString) {
-          await Simulator.getInstance().selectIoTHub();
-        }
-        if (!iotHubConnectionString) {
-          return;
-        }
-        const hostName = ConnectionString.parse(iotHubConnectionString)
-            .HostName;
-        const hostNamePersisted = this.persistedInputs.hostName;
-        await this.showWebview(
-            hostName !== hostNamePersisted,
-            hostName,
-            deviceConnectionStrings,
-        );
+        if (deviceItem) {
+            const hostName = ConnectionString.parse(iotHubConnectionString)
+                .HostName;
+            const hostNamePersisted = this.persistedInputs.hostName;
+            deviceConnectionStrings.push(deviceItem.connectionString);
+            const deviceConnectionStringsPersisted = this.persistedInputs
+                .deviceConnectionStrings;
+            await this.showWebview(
+                hostName !== hostNamePersisted ||
+                deviceConnectionStrings !== deviceConnectionStringsPersisted,
+                hostName,
+                deviceConnectionStrings,
+            );
+        } else {
+            if (!iotHubConnectionString) {
+            await Simulator.getInstance().selectIoTHub();
+            }
+            if (!iotHubConnectionString) {
+            return;
+            }
+            const hostName = ConnectionString.parse(iotHubConnectionString)
+                .HostName;
+            const hostNamePersisted = this.persistedInputs.hostName;
+            await this.showWebview(
+                hostName !== hostNamePersisted,
+                hostName,
+                deviceConnectionStrings,
+            );
       }
     }
   }
@@ -142,27 +142,28 @@ export class Simulator {
       interval: number,
   ) {
     if (!this.processing) {
-      this.processing = true;
-      await this.sendD2CMessageFromMultipleDevicesRepeatedly(
-          deviceConnectionStrings,
-          template,
-          isTemplate,
-          numbers,
-          interval,
-      );
-      this.processing = false;
-      // The cancel token can only be re-initialized out of any send() or delay() functions.
-      this.cancelToken = false;
+        this.processing = true;
+        this.outputChannel.show();
+        await this.sendD2CMessageFromMultipleDevicesRepeatedly(
+            deviceConnectionStrings,
+            template,
+            isTemplate,
+            numbers,
+            interval,
+        );
+        this.processing = false;
+        // The cancel token can only be re-initialized out of any send() or delay() functions.
+        this.cancelToken = false;
     } else {
-      vscode.window.showErrorMessage(
-          "A previous simulation is in progress, please wait or cancel it.",
-      );
+        vscode.window.showErrorMessage(
+            "A previous simulation is in progress, please wait or cancel it.",
+        );
     }
   }
 
-  public getStatus(): SendStatus {
-    return this.totalStatus;
-  }
+    public getStatus(): SendStatus {
+        return this.totalStatus;
+    }
 
   public persistInputs(persistedInputs) {
     this.persistedInputs = persistedInputs;
@@ -212,7 +213,6 @@ export class Simulator {
   ) {
     return (err, result) => {
       const total = status.getTotal();
-
       if (err) {
         TelemetryClient.sendEvent(aiEventName, { Result: "Fail" });
         status.addFailed();
