@@ -26,7 +26,7 @@
     <div id="app" data-endpoint="{{endpoint}}" v-cloak>
         <Row>
             <i-col span="15">
-                <Card :dis-hover="true" :bordered="false">
+                <Card :dis-hover="true" :bordered="false" :style="{width: 80}">
                     <Row>
                         <i-col span="24">
                             <h1>
@@ -88,8 +88,11 @@
                                 <i-col span="24">
                                     <radio-group v-model="messageBody" @on-change="messageBodyChange">
                                         <Radio label="Plain Text">Plain Text</Radio>
-                                        <Radio label="Dummy Json">Dummy Json</Radio>
-                                        <Tooltip max-width="500" placement="top">
+                                        <!-- Set transfer=true, to append the layer in body.
+                                          When used in Tabs or a fixed Table column, by adding this property,
+                                          Tooltip will not be affected by the parent style, resulting in better results. -->
+                                        <Radio label="Dummy Json">Dummy Json
+                                        <Tooltip theme="light" transfer max-width="500" placement="top">
                                           <Icon type="ios-help-circle"></Icon>
                                           <div slot="content">
 <p>Dummy JSON is a Node utility that allows you to generate random JSON data using Handlebars templates.
@@ -97,10 +100,10 @@
 </p>
                                           </div>
                                         </Tooltip>
+                                        </Radio>
                                     </radio-group>
                                 </i-col>
                             </Row>
-                            
                         <Row>
                             <i-col span="24">
                                 <Tabs v-model="messageInputAreaTab" @on-click="textAreaOnChange" :animated="false">
