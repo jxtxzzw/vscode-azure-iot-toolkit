@@ -29,9 +29,6 @@
                 <Card :dis-hover="true" :bordered="false" :style="{width: 80}">
                     <Row>
                         <i-col span="24">
-                            <h1>
-                                IoT Device Simulator
-                            </h1>
                             <p>
                                 {{ introduction }}
                             </p>
@@ -88,12 +85,14 @@
                                 <i-col span="24">
                                     <radio-group v-model="messageBody" @on-change="messageBodyChange">
                                         <Radio label="Plain Text">Plain Text</Radio>
-                                        <!-- Set transfer=true, to append the layer in body.
-                                          When used in Tabs or a fixed Table column, by adding this property,
-                                          Tooltip will not be affected by the parent style, resulting in better results. -->
                                         <Radio label="Dummy Json">Dummy Json
                                         <Tooltip theme="light" transfer max-width="500" placement="top">
+                                          <!-- Set transfer=true, to append the layer in body.
+                                          When used in Tabs or a fixed Table column, by adding this property,
+                                          Tooltip will not be affected by the parent style, resulting in better results. -->
                                           <Icon type="ios-help-circle"></Icon>
+                                          <!-- In the content slot, content should begin from the left,
+                                          otherwise unexpected space will be regarded as part of content -->
                                           <div slot="content">
 <p>Dummy JSON is a Node utility that allows you to generate random JSON data using Handlebars templates.
   <a href="https://github.com/webroo/dummy-json">Click here to see advanced usage. <Icon type="md-open"></Icon></a>
