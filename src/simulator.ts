@@ -132,7 +132,8 @@ export class Simulator {
         const deviceConnectionStringsPersisted = this.persistedInputs
           .deviceConnectionStrings;
         await this.showWebview(
-          hostName !== hostNamePersisted || deviceConnectionStringsPersisted.length != 0,
+          hostName !== hostNamePersisted ||
+            deviceConnectionStringsPersisted.length != 0,
           hostName,
           deviceConnectionStrings
         );
@@ -217,19 +218,19 @@ export class Simulator {
     status: SendStatus,
     totalStatus: SendStatus
   ) {
-    return (err, result) => {
-      const total = status.getTotal();
+    return async (err, result) => {
+      const total = await status.getTotal();
       if (err) {
         TelemetryClient.sendEvent(aiEventName, { Result: "Fail" });
-        status.addFailed();
-        totalStatus.addFailed();
+        await status.addFailed();
+        await totalStatus.addFailed();
       }
       if (result) {
         TelemetryClient.sendEvent(aiEventName, { Result: "Success" });
-        status.addSucceed();
-        totalStatus.addSucceed();
+        await status.addSucceed();
+        await totalStatus.addSucceed();
       }
-      const sum = status.sum();
+      const sum = await status.sum();
       if (sum === total) {
         client.close(() => {
           return;
@@ -334,17 +335,17 @@ export class Simulator {
     }
     const endTime = new Date();
     this.output(
-      `${this.cancelToken ? "User aborted" : "All device(s) finished."}`
+      this.cancelToken ? `User aborted.` : `All device(s) finished sending in ${(endTime.getTime() - startTime.getTime()) /
+      1000} second(s).`
     );
     while (
       !this.cancelToken &&
-      this.totalStatus.sum() !== this.totalStatus.getTotal()
+      await this.totalStatus.sum() !== await this.totalStatus.getTotal()
     ) {
       await this.delay(500);
     }
     this.output(
-      `Duration: ${(endTime.getTime() - startTime.getTime()) /
-        1000} second(s), with ${this.totalStatus.getSucceed()} succeed, and ${this.totalStatus.getFailed()} failed.`
+      `${await this.totalStatus.getSucceed()} succeeded, and ${await this.totalStatus.getFailed()} failed.`
     );
   }
 }

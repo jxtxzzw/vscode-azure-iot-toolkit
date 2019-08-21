@@ -19,27 +19,27 @@ export class SendStatus {
     public getTotal(): number {
         return this.total;
     }
-    public getSent(): number {
+    public async getSent(): Promise<number> {
         return this.sent;
     }
-    public getSucceed(): number {
+    public async getSucceed(): Promise<number> {
         return this.succeed;
     }
-    public getFailed(): number {
+    public async getFailed(): Promise<number> {
         return this.failed;
     }
 
-    public addSent(deviceCount: number): void {
+    public async addSent(deviceCount: number): Promise<void> {
         this.sent += deviceCount;
     }
-    public addSucceed(): void {
+    public async addSucceed(): Promise<void> {
         this.succeed++;
     }
-    public addFailed(): void {
+    public async addFailed(): Promise<void> {
         this.failed++;
     }
 
-    public sum(): number {
+    public async sum(): Promise<number> {
         return this.succeed + this.failed;
     }
 }
