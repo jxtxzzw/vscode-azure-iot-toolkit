@@ -221,12 +221,10 @@ export class Simulator {
     return async (err, result) => {
       const total = await status.getTotal();
       if (err) {
-        TelemetryClient.sendEvent(aiEventName, { Result: "Fail" });
         await status.addFailed();
         await totalStatus.addFailed();
       }
       if (result) {
-        TelemetryClient.sendEvent(aiEventName, { Result: "Success" });
         await status.addSucceed();
         await totalStatus.addSucceed();
       }
